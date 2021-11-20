@@ -88,5 +88,73 @@ echo "$@"
 * 사용된 옵션은 다른 인수들과 마찬가지로 $1, $2, ... positional parameters 형태로 전달되므로 스크립트 내에서 직접 옵션을 해석해서 사용해야 한다. 이때 옵션 해석 작업을 쉽게 도와주는 명령이다.
 
 * 옵션에는 short 옵션과 long 옵션이 있는데 getopts 명령은 short 옵션을 처리한다.
+
+### Option string 와 $OPTIND
+***
+* **명령에서 -a, -b, -c 세 개의 옵션을 사용한다면 getopts 명령에 설정하는 optstring 값은 abc 가 된다. args 에는 명령 실행시 사용된 인수 값들이 오는데 생략할 경우 "$@" 가 사용된다.**
+**예제
+
+```shell
+# 다음 set 명령은 실제 "command -a -bc hello world" 명령을 실행했을 때와 같이
+# positional parameters 를 설정한다.
+```
+<img src="https://user-images.githubusercontent.com/43926186/142719666-db5c0663-100f-4898-94d0-06bff08afd8f.PNG" width="90%" height="85%"/>
+
+```shell
+# 처음 $OPTIND 값은 1 로 -a 를 가리킨다.
+```
+<img src="https://user-images.githubusercontent.com/43926186/142719906-17f0851f-e7fb-45f4-91e7-6585e1ccbfa7.PNG" width="90%" height="85%"/>
+
+```shell
+# getopts 명령을 실행할 때마다 opt 변수값과 OPTIND 값이 변경되는 것을 볼 수 있다.
+ # 다음 옵션 "b" 의 index 값은 2 가 됩니다.
+```
+<img src="https://user-images.githubusercontent.com/43926186/142719910-0c14d7b1-cd87-4881-8d96-20d21063758b.PNG" width="90%" height="85%"/>
+
+```shell
+# 다음 옵션 "c" 는 "b" 와 붙여 쓰기를 하여 같은 OPTIND값을 가진다.
+# ( sh 의 경우에는 b, 3 가 출력된다. )
+```
+
+<img src="https://user-images.githubusercontent.com/43926186/142719914-971c340c-9dd7-41cf-b752-82981d1f27cc.PNG" width="90%" height="85%"/>
+```shell
+# args 부분을 생략하면 default 값은 "$@" 이다.
+```
+<img src="https://user-images.githubusercontent.com/43926186/142719920-4fd53818-a61c-4779-bc89-5f89f39fac7c.PNG" width="90%" height="85%"/>
+
+```shell 
+# 옵션 스트링을 처리하고 난후 다음과 같이 shift 를 하면 나머지 명령 인수만 남게 됩니다.
+```
+<img src="https://user-images.githubusercontent.com/43926186/142719923-e526eb06-eed9-401e-91d0-c634f00d305e.PNG" width="90%" height="85%"/>
+
+### getopts의 옵션
+***
+1) **short 옵션**
+* short 옵션은 다음과 같이 여러 가지 방법으로 사용할 수 있다. getopts 명령을 이용하지 않고 직접 옵션을 해석해 처리한다면 옵션 처리에만 스크립트가 복잡해질 수 있다.**
+```shell
+$ command -a -b -c
+
+# 옵션을 붙여서 사용할 수 있으며 순서가 바뀌어도 된다.
+$ command -abc
+$ command -b -ca
+
+# 옵션인수를 가질 수 있다.
+$ command -a xxx -b -c yyy
+
+# 옵션인수를 옵션에 붙여 쓸 수가 있다.
+# 그러므로 다음은 위의 예와 동일하게 해석됩니다.
+$ command -axxx -bcyyy
+
+# 옵션 구분자 '--' 가 올경우 우측에 있는 값은 옵션으로 해석하면 안된다.
+$ command -a -b -- -c
+```
+2) **long 옵션**
+* --posix, --warning level 와 같은 형태로 사용되는 long 옵션은 short 옵션과는 달리 붙여 쓸 수가 없기 때문에 사용방법이 간단하여 직접 해석해서 처리하는 것이 어렵지 않다.
+
+* 명령문을 getopts 으로 처리한다면 옵션 스트링으로 :a:b- 를 사용하고 case 문에서는 -) 를 사용해야 -- 로 시작하는 long 옵션을 받을 수 있다.
+
+* hort 옵션은 하나의 문자를 옵션으로 보기 때문에 이후에 p, o, s, i, x 가 모두 붙여쓰기한 옵션명으로 인식을 하게 된다.
+
+* **따라서 getopts 명령으로 short, long 옵션을 동시에 처리하는 것은 어려우므로 먼저 long 옵션을 처리하고 난후 나머지 short 옵션만 정리하여 getopts 에 넘겨주면 이전과 동일하게 short 옵션을 처리할 수 있다.**
 ## sed
 ## awk
