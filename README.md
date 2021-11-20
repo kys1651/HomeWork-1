@@ -381,7 +381,45 @@ $ sed '/hello/p' tempfile.txt
 ```
 
 
+## awk(파일에서 패턴이 일치하는 행을 찾아서 그러한 행에 지정한 조치를 수행)
+* awk는 파일로부터 레코드(record)를 선택하고, 선택된 레코드에 포함된 값을 조작하거나 데이터화하는 것을 목적으로 사용한다.
 
+* awk 명령의 입력으로 지정된 파일로부터 데이터를 분류한 다음, 분류된 텍스트 데이터를 바탕으로 패턴 매칭 여부를 검사하거나 데이터 조작 및 연산 등의 액션을 수행하고, 그 결과를 출력한다.
 
+* 패턴, 분류, 텍스트, 조작, 연산, 액션. 뭔가 복잡한 작업을 하는 프로그램이다.
 
-## awk
+### awk 명령으로 할 수 있는 일
+***
+1) 텍스트 파일의 전체 내용 출력한다.
+2) 파일의 특정 필드만 출력한다.
+3) 특정 필드에 문자열을 추가해서 출력한다/.
+4) 패턴이 포함된 레코드 출력한다.
+5) 특정 필드에 연산 수행 결과 출력한다.
+6) 필드 값 비교에 따라 레코드 출력한다.
+### awk 명령어 옵션
+***
+```shell
+awk [OPTION...] [awk program] [ARGUMENT...]
+      OPTION
+        -F        : 필드 구분 문자 지정.
+        -f        : awk program 파일 경로 지정.
+        -v        : awk program에서 사용될 특정 variable값 지정.
+      awk program
+        -f 옵션이 사용되지 않은 경우, awk가 실행할 awk program 코드 지정.
+      ARGUMENT
+        입력 파일 지정 또는 variable 값 지정.
+```
+### awk 사용 예시
+***
+> 1) 파일의 모든 내용 출력
+<img src="https://user-images.githubusercontent.com/43926186/142721829-905a6dca-6394-4c23-91a6-551fc51809b8.PNG" width="90%" height="85%"/>
+
+> 2) 파일의 특정 필드 부분만 출력
+<img src="https://user-images.githubusercontent.com/43926186/142721851-892a371d-97c2-476f-8355-7b848dd544da.PNG" width="90%" height="85%"/>
+
+> 3) 필드 값에 임의 문자열을 같이 출력.
+<img src="https://user-images.githubusercontent.com/43926186/142721867-f726b673-1cff-4604-91a0-0004c0068997.PNG" width="90%" height="85%"/>
+
+> 4) 지정된 문자열을 포함하는 레코드만 출력.
+<img src="https://user-images.githubusercontent.com/43926186/142721877-06dd21f1-7120-4cdb-a7b0-fce92944a7d7.PNG" width="90%" height="85%"/>
+
