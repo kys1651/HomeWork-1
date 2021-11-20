@@ -1,7 +1,5 @@
 # HomeWork
-
-
-
+  
 
 ## getopt(명령행 플래그와 매개변수를 구문분석)
 * getopt는 플래그와 인수를 지정하는 형식으로 토큰 리스트를 구문 분석한다. 플래그는 단일 아스키이며 뒤에 :(콜론)이 올 경우 하나 이상의 탭 또는 공백으로 분리하거나 분리할 수 없는 인수가 있어야 한다. 인수에는 복수 바이트를 포함시킬 수 있지만 플래그 문자로는 포함시킬 수 없다.
@@ -10,7 +8,7 @@
  
 * 설정되지 않은 옵션을 사용하거나 인자가 빠진 경우에는 getopt 명령은 메시지를 출력한다.
  
-* /usr/bin/getopt 에 위치한 외부 명령이다.
+ * /usr/bin/getopt 에 위치한 외부 명령이다.
 
 ### getopt의 옵션
 ***
@@ -132,7 +130,7 @@ echo "$@"
 
 ### getopts의 옵션
 ***
-1) **short 옵션**
+> 1) **short 옵션**
 * short 옵션은 다음과 같이 여러 가지 방법으로 사용할 수 있다. getopts 명령을 이용하지 않고 직접 옵션을 해석해 처리한다면 옵션 처리에만 스크립트가 복잡해질 수 있다.**
 ```shell
 $ command -a -b -c
@@ -151,7 +149,7 @@ $ command -axxx -bcyyy
 # 옵션 구분자 '--' 가 올경우 우측에 있는 값은 옵션으로 해석하면 안된다.
 $ command -a -b -- -c
 ```
-2) **long 옵션**
+> 2) **long 옵션**
 * --posix, --warning level 와 같은 형태로 사용되는 long 옵션은 short 옵션과는 달리 붙여 쓸 수가 없기 때문에 사용방법이 간단하여 직접 해석해서 처리하는 것이 어렵지 않다.
 
 * 명령문을 getopts 으로 처리한다면 옵션 스트링으로 `:a:b-` 를 사용하고 case 문에서는 -) 를 사용해야 -- 로 시작하는 long 옵션을 받을 수 있다.
@@ -313,7 +311,7 @@ echo "$@"
 ### sed 예시
 ***
 
-1) 치환 예시
+> 1) 치환 예시
 ```shell
 #특정 문자열 바꾸기
 $ sed 's/hello/goodbye/' tempfile.txt
@@ -331,7 +329,7 @@ $ sed '/hello/,/goodbye/s/bad/good/g' tmepfile.txt
 #특정라인의 문자 치환
 $ sed -n '5s/hello/####/g' tmepfile.txt
 ```
-2) 삭제 예시
+> 2) 삭제 예시
 ```shell
 #특정 문자열 포함한 라인 제거
 $ sed 's/hello/d' tempfile.txt
@@ -365,7 +363,7 @@ $ who | sed 's/^.*$//'
 $ who | sed 's/^.*://'
 ```
 
-3) 입/출력 예시
+> 3) 입/출력 예시
 ```shell
 #각 라인마다 뒤에 Hello World! 문자를 입력
 $ sed 'a\\Hello World\!' tempfile.txt
