@@ -275,5 +275,113 @@ echo "$@"
 ```
 <img src="https://user-images.githubusercontent.com/43926186/142720564-f5502965-c86a-4d3a-bb3b-d9033a9650c6.PNG" width="90%" height="85%"/>
 
-## sed
+## sed(스트림 편집기)
+* ed명령어와 grep명령어 기능의 일부를 합친 것이 sed(stream editor)명령어이다.
+
+* sed는 각 라인을 읽을 때마다 ed에서 사용하던 형식의 대치작업을 실행한다. 일치하는 문자열이 있으면 그 문자열을 대치한 후 출력하고 일치하는 문자열이 없으면 그 라인은 수정되지 않고 그대로 출력된다.
+
+* sed 명령어를 호출하는 형식은 grep명령어와 같지만 완전한 형식의 대치 연산자를 사용한다는 점만이 다르다.
+
+### sed 사용법
+***
+* 기본
+
+
+`$ sed [옵션] 스크립트 입력파일1 [입력파일2 ... ]`
+* 옵션
+
+
+|**옵션**|**별칭**|**기능**|
+|:---|:----|:-----|
+|**-n**|–quiet, –silent|읽어들인 라인을 암시적으로 자동출력하는 것을 중단한다.|
+|**-e**|–expression=script|실행될 명령에 스크립트를 추가한다|
+|**-f script_file**|–file=script_file|스크립트 파일의 내용을 가져와서 추가로 실행한다.|
+|–follow-symlinks||제자리 처리시에 심볼릭 링크를 따르도록 한다. 하드링크는 깨진다.|
+|-i[SUFFIX]|–in-place[=SUFFIX]|파일을 제자리 처리한다. (즉 변경된 내용을 파일에 적용한다.)|
+|-c||제자리 처리시에 사본을 이용한다.|
+|-l N|–copy|한줄의 길이를 정의한다.|
+||–line-length=N|모든 GNU확장을 제외한다.–line-length=N|
+|-r|–posix|확장된 정규식 패턴을 사용한다.|
+|-s|–regexp-extended|파일을 하나의 긴 스트림이 아닌 분리된 데이터들로 처리한다.|
+|-u|	–separate|입력으로부터 최소한의 내용만 읽고 더 자주 플러시한다.|
+> 진하게 표시된것은 자주 사용하는것
+
+
+### sed 예시
+***
+
+1) 치환 예시
+```shell
+#특정 문자열 바꾸기
+$ sed 's/hello/goodbye/' tempfile.txt
+ 
+#특정 문자열이 포함된 행에서 특정 문자만 제거 하기
+$ sed 's/hello//g' tempfile.txt
+ 
+#파일의 일부만 편집해야 할 경우 라인의 범위를 지정하여 사용가능
+$ sed '3,7s/hello//g' tempfile.txt
+ 
+#라인 번호 대신 문맥을 범위로 지정한 경우
+$ sed '/hello/,/goodbye/s/bad/good' tmepfile.txt
+$ sed '/hello/,/goodbye/s/bad/good/g' tmepfile.txt
+ 
+#특정라인의 문자 치환
+$ sed -n '5s/hello/####/g' tmepfile.txt
+```
+2) 삭제 예시
+```shell
+#특정 문자열 포함한 라인 제거
+$ sed 's/hello/d' tempfile.txt
+ 
+#3번째 라인을 삭제 
+$ sed '3d' tempfile.txt
+ 
+#princess 또는 Princess를 포함하고 있는 라인들을 삭제함
+$ sed '/[hH]ello/d' tempfile.txt
+ 
+#라인 1부터 hello를 포함하고 있는 첫번째 라인까지 모든 라인을 삭제함
+$ sed '1,/hello/d' tempfile.txt
+ 
+#tempfile.xtxt 안의 데이터로부터 처음 세 개의 문자열을 삭제함
+$ sed 's/...//' tempfile.txt
+ 
+#tempfile.xtxt 안의 데이터로부터 마지막 세 개의 문자열을 삭제함
+$ sed 's/...$//' tempfile.txt
+ 
+#모든 공백라인 제거
+$ sed '^$/d' tempfile.txt
+ 
+#여기서부터는 실제 cli창에 테스트 해보세요!
+#각 라인의 첫번째 공백에서 마지막까지 삭제함
+$ who | sed 's/ .*$//'
+ 
+#각 라인의 처음부터 맨 마지막 공백까지 삭제
+$ who | sed 's/^.*$//'
+ 
+#각 라인의 처음부터 : 문자가 있는 곳(:문자포함)까지 삭제
+$ who | sed 's/^.*://'
+```
+
+3) 입/출력 예시
+```shell
+#각 라인마다 뒤에 Hello World! 문자를 입력
+$ sed 'a\\Hello World\!' tempfile.txt
+ 
+#3번째라인 뒤에 Good Morning 문자 삽입
+$ sed '3a\\Good Morning' tempfile.txt
+ 
+#각 라인마다 공백라인 추가
+$ sed 'a\\' tempfile.txt
+ 
+#hello 문자가 들어있는 line만 프린트
+$ sed -n '/hello/p' tempfile.txt
+ 
+#hello 문자가 들어있는 라인 중복 출력?
+$ sed '/hello/p' tempfile.txt
+```
+
+
+
+
+
 ## awk
