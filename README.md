@@ -107,7 +107,7 @@ echo "$@"
 
 ```shell
 # getopts 명령을 실행할 때마다 opt 변수값과 OPTIND 값이 변경되는 것을 볼 수 있다.
- # 다음 옵션 "b" 의 index 값은 2 가 됩니다.
+ # 다음 옵션 "b" 의 index 값은 2 가 된다.
 ```
 <img src="https://user-images.githubusercontent.com/43926186/142719910-0c14d7b1-cd87-4881-8d96-20d21063758b.PNG" width="90%" height="85%"/>
 
@@ -123,7 +123,7 @@ echo "$@"
 <img src="https://user-images.githubusercontent.com/43926186/142719920-4fd53818-a61c-4779-bc89-5f89f39fac7c.PNG" width="90%" height="85%"/>
 
 ```shell 
-# 옵션 스트링을 처리하고 난후 다음과 같이 shift 를 하면 나머지 명령 인수만 남게 됩니다.
+# 옵션 스트링을 처리하고 난후 다음과 같이 shift 를 하면 나머지 명령 인수만 남게 된다.
 ```
 <img src="https://user-images.githubusercontent.com/43926186/142719923-e526eb06-eed9-401e-91d0-c634f00d305e.PNG" width="90%" height="85%"/>
 
@@ -142,7 +142,7 @@ $ command -b -ca
 $ command -a xxx -b -c yyy
 
 # 옵션인수를 옵션에 붙여 쓸 수가 있다.
-# 그러므로 다음은 위의 예와 동일하게 해석됩니다.
+# 그러므로 다음은 위의 예와 동일하게 해석된다.
 $ command -axxx -bcyyy
 
 # 옵션 구분자 '--' 가 올경우 우측에 있는 값은 옵션으로 해석하면 안된다.
@@ -155,6 +155,125 @@ $ command -a -b -- -c
 
 * hort 옵션은 하나의 문자를 옵션으로 보기 때문에 이후에 p, o, s, i, x 가 모두 붙여쓰기한 옵션명으로 인식을 하게 된다.
 
-* **따라서 getopts 명령으로 short, long 옵션을 동시에 처리하는 것은 어려우므로 먼저 long 옵션을 처리하고 난후 나머지 short 옵션만 정리하여 getopts 에 넘겨주면 이전과 동일하게 short 옵션을 처리할 수 있다.**
+> 따라서 getopts 명령으로 short, long 옵션을 동시에 처리하는 것은 어려우므로 먼저 long 옵션을 처리하고 난후 나머지 short 옵션만 정리하여 getopts 에 넘겨주면 이전과 동일하게 short 옵션을 처리할 수 있다.
+
+
+### 오류 출력
+***
+위 예제에서 옵션 스트링에 없는 문자, 예를 들면 -d 를 사용하게 되면 오류 메시지가 출력되는 것을 볼 수 있는데, getopts 명령은 error reporting 과 관련해서 다음과 같은 두 개의 모드를 제공한다.
+
+|**Verbose mode**||
+|:---:|:----:|
+|invalid 옵션 사용|opt 값을 ? 문자로 설정,OPTARG 값은 unset, 오류 메시지 출력|
+|옵션 인수 값 제공 x|opt 값을 ? 문자로 설정,OPTARG 값은unset, 오류 메시지 출력|
+
+|**Silent mode**||
+|:----:|:----:|
+|invalid 옵션 사용|opt 값을 ? 문자로 설정,OPTARG 값은 해당 옵션 문자로 설정|
+|옵션 인수 값 제공 x|opt 값을 ? 문자로 설정,OPTARG 값은 해당 옵션 문자로 설정|
+
+> default 는 verbose mode 인데 기본적으로 옵션과 관련된 오류메시지가 표시되므로 스크립트를 배포할 때는 잘 사용하지 않고 대신 silent mode 를 이용한다. silent mode 를 설정하기 위해서는 옵션 스트링의 맨 앞부분에 : 문자를 추가해 주면 된다.
+
+### 주의해야하는 점
+***
+* OPTIND, OPTARG 변수는 local 변수가 아니므로 필요할 경우 함수 내에서 local 로 설정해 사용해야 한다.
+```shell
+# 옵션 스트링이 'a:bc' 이면 -a 는 옵션인수를 갖는데, 옵션인수는 어떤 문자도 올 수 있기 때문에
+# 다음과 같이 -a 에 옵션인수가 설정되지 않으면 -b 가 -a 의 옵션 인수가 된다.
+$ command -a -b -c
+
+# 파일명이나 기타 스트링은 마지막에 와야하는데 그렇지 않을 경우 이후 옵션은 인식되지 않는다.
+# 다음의 경우 옵션 스트링이 'abc' 라면 -b -c 옵션은 인식되지 않는다.
+$ command -a foo.c -b -c
+```
+### 예제
+***
+```shell
+#!/bin/bash
+
+usage() {
+    err_msg "Usage: $0 -a <string> -b --long <string> --posix --warning[=level]"
+    exit 1
+}
+
+err_msg() { echo "$@" ;} >&2
+err_msg_a() { err_msg "-a option argument required" ;}
+err_msg_l() { err_msg "--long option argument required" ;}
+
+########################## long 옵션 처리 부분 #############################
+A=""
+while true; do
+    [ $# -eq 0 ] && break
+    case $1 in
+        --long) 
+            shift    # 옵션인수를 위한 shift
+            # --long 은 옵션인수를 갖는데 옵션인수가 오지 않고 다른 옵션명(-*) 이 오거나
+            # 명령의 끝에 위치하여 옵션인수가 설정되지 않았을 경우 ("")
+            case $1 in (-*|"") err_msg_l; usage; esac
+            err_msg "--long was triggered!, OPTARG: $1"
+            shift; continue
+            ;;
+        --warning*)
+            # '=' 로 분리된 level 값을 처리하는 과정
+            case $1 in (*=*) level=${1#*=}; esac
+            err_msg "--warning was triggered!, level: $level"
+            shift; continue
+            ;;
+        --posix) 
+            err_msg "--posix was triggered!"
+            shift; continue
+            ;;
+        --)
+            # '--' 는 옵션의 끝을 나타내므로 나머지 값 '$*' 을 A 에 append 하고 break 
+            # 이때 IFS 값을 '\a' 로 변경해야 $* 내의 인수 구분자가 '\a' 로 됨.
+            IFS=$(echo -e "\a")
+            A=$A$([ -n "$A" ] && echo -e "\a")$*
+            break
+            ;;
+        --*) 
+            err_msg "Invalid option: $1"
+            usage;
+            ;;
+    esac
+
+    A=$A$([ -n "$A" ] && echo -e "\a")$1
+    shift
+done
+
+# 이후부터는 '$@' 값에 short 옵션만 남는다.
+# -a aaa -b -- hello world 
+IFS=$(echo -e "\a"); set -f; set -- $A; set +f; IFS=$(echo -e " \n\t")
+
+########################## short 옵션 처리 부분 #############################
+
+# 이전과 동일하게 short 옵션을 처리한다.
+while getopts ":a:b" opt; do
+    case $opt in
+        a)
+            case $OPTARG in (-*) err_msg_a; usage; esac
+            err_msg "-a was triggered!, OPTARG: $OPTARG"
+            ;;
+        b)
+            err_msg "-b was triggered!"
+            ;;
+        :)
+            case $OPTARG in
+                a) err_msg_a ;;
+            esac
+            usage
+            ;;
+        \?)
+            err_msg "Invalid option: -$OPTARG"
+            usage
+            ;;
+    esac
+done
+
+shift $(( OPTIND - 1 ))
+echo ------------------------------------
+echo "$@"
+```
+<img src="https://user-images.githubusercontent.com/43926186/142720564-f5502965-c86a-4d3a-bb3b-d9033a9650c6.PNG" width="90%" height="85%"/>
+
 ## sed
 ## awk
